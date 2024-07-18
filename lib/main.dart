@@ -5,24 +5,36 @@ void main() {
   runApp(const MainApp());
 }
 
-Stream<String> getTime() => Stream.periodic(
-      const Duration(seconds: 1),
-      (_) => DateTime.now().toIso8601String(),
-    );
-
 class MainApp extends HookWidget {
   const MainApp({super.key});
   @override
   Widget build(BuildContext context) {
-    final time = useStream(getTime());
+    final controller = useTextEditingController();
+    final controller2 = useTextEditingController();
+    final text = useState("");
+
+    useEffect(
+      () {
+        controller.addListener(() {
+          text.value = controller.text;
+        });
+        return null;
+      },
+      [controller, controller2],
+    );
 
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: Text(time.data ?? ''),
-        ),
-        body: const Center(
-          child: Text('Hello World!'),
+        appBar: AppBar(),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              TextField(controller: controller),
+              TextField(controller: controller2),
+              Text('Text you typed in the first field: ${text.value}'),
+            ],
+          ),
         ),
       ),
     );
